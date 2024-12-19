@@ -1,17 +1,15 @@
 package com.example.controller;
 
-import java.util.Optional;
 import com.example.entity.Account;
 import com.example.entity.Message;
 
-import org.apache.catalina.connector.Response;
-import org.apache.tomcat.websocket.AuthenticationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import com.example.service.AccountService;
 import com.example.service.MessageService;
-import org.springframework.http.ResponseEntity;
+
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 
@@ -65,4 +63,11 @@ public class SocialMediaController {
     public ResponseEntity<Integer> updateMessageById(@PathVariable int message_id, @RequestBody Message message) {
         return messageService.updateMessageById(message_id, message.getMessageText());
     }
+
+    @GetMapping("accounts/{account_id}/messages")
+    public ResponseEntity<List<Message>> getAllMessagesByAccountId(@PathVariable int account_id) {
+        List<Message> message1 = messageService.getAllMessagesByAccountId(account_id);
+        return ResponseEntity.status(HttpStatus.OK).body(message1);
+    }
+
 }

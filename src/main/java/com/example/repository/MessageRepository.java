@@ -7,6 +7,6 @@ import java.util.List;
 
 @Repository
 public interface MessageRepository extends JpaRepository<Message, Integer>{
-    @Query("FROM Message WHERE posted_by = ?1")
-    List<Message> findAllMessagesByPostedBy(int account_id);
+
+    List<Message> findByPostedBy(int account_id);
 }
