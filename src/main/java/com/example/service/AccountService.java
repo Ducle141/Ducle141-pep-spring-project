@@ -30,4 +30,9 @@ public class AccountService {
         Account account = new Account(username, password);
         return accountRepository.save(account);
     }
+
+    public Account loginAccount(String username, String password) {
+        System.out.print("3---" + accountRepository.findByUsername(username));
+        return accountRepository.findByUsername(username);
+    }
 }
