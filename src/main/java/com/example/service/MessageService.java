@@ -55,4 +55,17 @@ public class MessageService {
         }
         return null;
     }
+
+    public ResponseEntity<Integer> deleteMessageById(int id) {
+        Optional<Message> searchedMessage = messageRepository.findById(id);
+        if (!searchedMessage.isPresent()) {
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(null);
+        }
+        else {
+            messageRepository.deleteById(id);
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(1);
+        }
+    }
 }
