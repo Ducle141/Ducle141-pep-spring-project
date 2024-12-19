@@ -47,4 +47,12 @@ public class MessageService {
                 .body(messageRepository.findAll());     
     }
 
+    public ResponseEntity<Message> getMessageById(int id) {
+        Optional<Message> searchedMessage = messageRepository.findById(id);
+        if (searchedMessage.isPresent()) {
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(searchedMessage.get());
+        }
+        return null;
+    }
 }
