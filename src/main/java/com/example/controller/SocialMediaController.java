@@ -9,9 +9,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import com.example.service.AccountService;
 import com.example.service.MessageService;
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
+import com.example.exception.InvalidRegistrationException;
+import com.example.exception.UserAlreadyExistsException;
 
 @RestController
 public class SocialMediaController {
@@ -28,32 +29,21 @@ public class SocialMediaController {
     public ResponseEntity<Account> register(@RequestBody Account account) {
         Account toRet = accountService.registerUser(account);
         return ResponseEntity.status(HttpStatus.OK).body(toRet);
-        // try {
-        //     Account newAccount = accountService.registerAccount(account.getUsername(), account.getPassword());
-        //     System.out.print("---------");
-        //     System.out.println(newAccount);
-        //     return ResponseEntity.ok(newAccount);
-        // } catch (IllegalArgumentException e) {
-        //     if (e.getMessage().contains("Username already exists")) {
-        //         return ResponseEntity.status(409).build();
-        //     }
-        //     return ResponseEntity.status(400).build();
-        // }
+
     }
 
-    @PostMapping("/login")
-    public ResponseEntity<Account> login(@RequestBody Account account) throws AuthenticationException{
-        String username = account.getUsername();
-        String password = account.getPassword();
-        Optional<Account> retrievedUsername = accountService.loginAccount(username, password);
-        if (retrievedUsername.isPresent()) {
-            if (retrievedUsername.getPassword().equals(password)) {
-                return ResponseEntity.ok(retrievedUsername);
-            }
-        } else {
-            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-            
-        }
+    @ExceptionHandler(InvalidRegistrationException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public @ResponseBody String handleInvalidRegistration(InvalidRegistrationException e)
+    {
+        return e.getMessage();
+    }
+    
+    @ExceptionHandler(UserAlreadyExistsException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public @ResponseBody String handleUserAlreadyExists(UserAlreadyExistsException e)
+    {
+        return e.getMessage();
     }
 }
 
