@@ -6,6 +6,9 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.apache.tomcat.websocket.AuthenticationException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
+
 import com.example.entity.Account;
 import com.example.repository.AccountRepository;
 import com.example.exception.*;
@@ -21,24 +24,32 @@ public class AccountService {
         this.accountRepository = ar;
     }
 
-    public Account registerUser(Account account) throws InvalidRegistrationException, UserAlreadyExistsException
-    {
-        String username = account.getUsername();
-        String password = account.getPassword();
-        if(username == "" || password.length() < 4) {
-            throw new InvalidRegistrationException();
-        } else if(accountRepository.findByUsername(username).isPresent()) {
-            throw new UserAlreadyExistsException();
-        } else {
-            return accountRepository.save(account);
+    public ResponseEntity<Account> registerAccount(Account account) {
+        Optional<Account> optionalAccount = accountRepository.findAccountByUsername(account.getUsername());
+        if (optionalAccount.isPresent()) {
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body(null);
+        }
+        if (account.getUsername().length() == 0 || account.getPassword().length() < 4) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(null);
+        }
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(accountRepository.save(account));
+    }
+
+    public ResponseEntity<Account> loginAccount(Account account) {
+
+        Optional<Account> optionalAccount = accountRepository.findAccountByUsernameAndPassword(account.getUsername(),account.getPassword());
+        if (optionalAccount.isPresent()) {
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(optionalAccount.get());
+        }
+        else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(null);
         }
     }
 
-    public Account login(Account account) throws AuthenticationException
-    {
-        return accountRepository.findByUsernameAndPassword(account.getUsername(), account.getPassword())
-            .orElseThrow(() -> new AuthenticationException(null));
-    }
-    
-    
 }
