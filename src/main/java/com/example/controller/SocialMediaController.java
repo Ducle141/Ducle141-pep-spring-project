@@ -13,21 +13,19 @@ import com.example.service.MessageService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
 
-import com.example.exception.InvalidMessageLengthException;
-import com.example.exception.InvalidRegistrationException;
-import com.example.exception.InvalidUserException;
-import com.example.exception.UserAlreadyExistsException;
 
 @RestController
 public class SocialMediaController {
     
+    @Autowired
     private AccountService accountService;
     private MessageService messageService;
 
 
     @Autowired
-    public SocialMediaController(AccountService accountService) {
+    public SocialMediaController(AccountService accountService, MessageService messageService) {
         this.accountService = accountService;
+        this.messageService = messageService;
     }
     
     @PostMapping("register")
@@ -38,6 +36,11 @@ public class SocialMediaController {
     @PostMapping("login")
     public ResponseEntity<Account> loginAccount(@RequestBody Account account) {
         return accountService.loginAccount(account);
+    }
+
+    @PostMapping("messages")
+    public ResponseEntity<Message> createMessage(@RequestBody Message message) {
+        return messageService.createMessage(message);
     }
 
 }

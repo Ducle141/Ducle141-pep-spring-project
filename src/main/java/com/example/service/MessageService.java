@@ -1,36 +1,45 @@
 package com.example.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import com.example.entity.Account;
 import com.example.entity.Message;
 import com.example.repository.MessageRepository;
 import java.util.List;
 import java.util.Optional;
-import com.example.exception.InvalidMessageLengthException;
-import com.example.exception.InvalidUserException;
 
+import javax.transaction.Transactional;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import com.example.repository.AccountRepository;
+import com.example.repository.MessageRepository;
 
 @Service
+@Transactional
 public class MessageService {
+    @Autowired
     private MessageRepository messageRepository;
-    private AccountService accountService;
+    private AccountRepository accountRepository;
 
     @Autowired
-    public MessageService(MessageRepository messRepo, AccountService accSer) {
-        this.messageRepository = messRepo;
-        this.accountService = accSer;
+    public MessageService(MessageRepository messageRepository, AccountRepository accountRepository) {
+        this.messageRepository = messageRepository;
+        this.accountRepository = accountRepository;
     }
 
-    public Message addMessage(Message messToAdd) throws InvalidUserException, InvalidMessageLengthException {
-        Integer userID = messToAdd.getPostedBy();
-        if(accountService.getAccountById(userID).isEmpty())
-        {
-            throw new InvalidUserException();
+    public ResponseEntity<Message> createMessage(Message message) {
+        Optional<Account> postedAccount = accountRepository.findById(message.getPostedBy());
+        if (message.getMessageText().length() == 0 || 
+            message.getMessageText().length() >= 255 || 
+            postedAccount.isPresent() == false) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body(null);
         }
-        String messageText = messToAdd.getMessageText();
-        if(messageText.length() == 0 || messageText.length() > 255)
-        {
-            throw new InvalidMessageLengthException();
+        else {
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(messageRepository.save(message));
         }
-        return messageRepository.save(messToAdd);
     }
+
 }
