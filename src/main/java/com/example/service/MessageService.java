@@ -42,4 +42,9 @@ public class MessageService {
         }
     }
 
+    public ResponseEntity<List<Message>> getAllMessages() {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(messageRepository.findAll());     
+    }
+
 }

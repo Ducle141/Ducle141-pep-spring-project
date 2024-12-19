@@ -13,6 +13,9 @@ import com.example.service.MessageService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
 
+import java.util.List;
+
+
 
 @RestController
 public class SocialMediaController {
@@ -41,6 +44,11 @@ public class SocialMediaController {
     @PostMapping("messages")
     public ResponseEntity<Message> createMessage(@RequestBody Message message) {
         return messageService.createMessage(message);
+    }
+
+    @GetMapping("messages")
+    public ResponseEntity<List<Message>> getAllMessages() {
+        return messageService.getAllMessages();
     }
 
 }
